@@ -1,3 +1,8 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Manikandan's World</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -264,6 +269,8 @@ html.modalOpen,html.modalOpen body{overflow:hidden}
 }
 </style>
 
+</head>
+<body>
 <canvas id="space" aria-hidden="true"></canvas>
 <div id="room">
   <div class="ext wall"></div><div class="ext wood"></div>
@@ -2148,3 +2155,6 @@ Promise.all([load(IMG_SRC), load(MASK_SRC), load(CLOUD_SRC), load(EARTH_SRC), ..
 }).catch(err=>{ console.error(err); loadingEl.textContent = "The painting couldn't load. Refresh the page to try again."; });
 })();
 </script>
+
+</body>
+</html>
