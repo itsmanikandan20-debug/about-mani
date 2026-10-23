@@ -1750,6 +1750,8 @@ function speedLines(c, t, a){
   c.restore();
 }
 let VERSE_PROG = 0;
+// after a few tools he flips upside down and dives head first; back upright just before the sky
+const FLIP = ()=> smooth(0.2, 0.32, VERSE_PROG)*(1 - smooth(0.9, 0.985, VERSE_PROG));
 const FALLS = ['fall0','fall1','fall2','fall3','fall4','fall5'];
 function tumbler(c, t, a, shout, showShout, mood, spinExtra){
   const H = vh*0.5, idx = Math.max(0, MOODS.indexOf(mood)) % 6;
@@ -1758,7 +1760,7 @@ function tumbler(c, t, a, shout, showShout, mood, spinExtra){
     // scared at first, then he relaxes and enjoys the fall
     const ctr = lerp(FV_SCARED, FV_HAPPY, smooth(0.05, 0.45, VERSE_PROG)), R = [Math.max(0, Math.round(ctr - 7)), Math.min(FV_N - 1, Math.round(ctr + 7))];
     const img = SP[fvName(fvPingPong(R[0], R[1], t, 12))], s2 = H*(vw < vh ? 0.68 : 0.92);
-    c.save(); c.globalAlpha = a; c.translate(bx, by); c.rotate(Math.sin(t*0.5)*0.08 + spinExtra); c.drawImage(img, -s2/2, -s2/2, s2, s2); c.restore();
+    c.save(); c.globalAlpha = a; c.translate(bx, by); c.rotate(Math.sin(t*0.5)*0.08*(1 - FLIP()) + FLIP()*Math.PI + Math.sin(t*0.8)*0.12*FLIP() + spinExtra); c.drawImage(img, -s2/2, -s2/2, s2, s2); c.restore();
   } else {
   const img = SP[FALLS[idx]], h = idx >= 4 ? H*0.62 : H, w = h*img.width/img.height;
   c.save(); c.globalAlpha = a; c.translate(bx, by); c.rotate(Math.sin(t*0.9)*0.35 + spinExtra); c.drawImage(img, -w/2, -h/2, w, h); c.restore();
@@ -1927,7 +1929,24 @@ function scrollToStory(r){ const x = r*SCROLL_TOTAL;
   if (x < 0.40) return x;
   if (x < 0.40 + WORK_SPAN) return 0.40 + (x - 0.40)*(0.18/WORK_SPAN);
   return x + (0.18 - WORK_SPAN); }
-function readScroll(){ const max = document.documentElement.scrollHeight - innerHeight; target = max>0 ? scrollToStory(clamp(scrollY/max)) : 0; }
+function storyToScroll(P){ const W = WORK_SPAN, x = P < 0.40 ? P : (P < 0.58 ? 0.40 + (P - 0.40)*W/0.18 : P - (0.18 - W)); return x/SCROLL_TOTAL; }
+const STOP_P = (()=>{ const L = 0.18, C = 0.40, out = [0.145, 0.183, 0.233, 0.323, C + 0.15*L, C + 0.32*L, C + 0.55*L, 0.59, 0.915];
+  for (let i=0;i<13;i++) out.push(0.645 + (i + 0.35)/13*(0.86 - 0.645));
+  return out.sort((a,b)=>a-b); })();
+let STOPS = STOP_P.map(storyToScroll), lastR = 0, pin = null, pinUntil = 0;
+function readScroll(){
+  const max = document.documentElement.scrollHeight - innerHeight; if (max <= 0){ target = 0; return; }
+  let r = clamp(scrollY/max); const now = performance.now();
+  if (pin !== null && now < pinUntil){ if (Math.abs(r - pin)*max > 2) window.scrollTo(0, pin*max); r = pin; }
+  else {
+    pin = null;
+    // crossed a stop since the last frame? hold there
+    const lo = Math.min(lastR, r), hi = Math.max(lastR, r);
+    const hit = STOPS.filter(s => s > lo + 1e-5 && s < hi - 1e-5);
+    if (hit.length && !reduced && !window.NOSNAP){ const s = r > lastR ? hit[0] : hit[hit.length - 1]; pin = s; pinUntil = now + 650; window.scrollTo(0, s*max); r = s; }
+  }
+  lastR = r; target = scrollToStory(r);
+}
 addEventListener('scroll', readScroll, {passive:true});
 addEventListener('resize', resize);
 addEventListener('pointermove', e=>{ mx=e.clientX/innerWidth*2-1; my=e.clientY/innerHeight*2-1; }, {passive:true});
