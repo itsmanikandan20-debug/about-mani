@@ -1077,7 +1077,7 @@ function drawCharacters(P, t, talking){
     else if (e < 2.6) fr = 'friendOh';                    // spots his friend with a flat tyre
     else if (e < 3.3) fr = 'friendHop';                   // big grin: "hop on!"
     else if (e < 4.1) fr = 'pass0';                     // he waves once as they set off
-    else fr = moving ? frameOf(PEDAL, dist, FH*0.9) : 'ped0';   // then sits back while his friend pedals
+    else fr = moving ? frameOf(PEDAL, dist, FH*2.2) : 'ped0';   // then sits back while his friend pedals
     if (e > 3.0 && e < 3.3){ const hop = clamp((e - 3.0)/0.3); actors.push(spr('stand', lerp(manBesideX, fxp - FH*0.3, hop), RIDE_Y + 8 - Math.sin(Math.PI*hop)*MH*0.25, MH, {z: fy + 31, shadow: 1 - hop})); }
     actors.push(spr(fr, fxp, fy, FH*(fr.startsWith('pass') ? 1.0 : 1.0), {z: fy + 30, shadowW: FH*0.48, bob: moving ? Math.abs(Math.sin(dist/FH*7))*0.008 : 0}));
     followX = Math.min(fxp, 1300);
