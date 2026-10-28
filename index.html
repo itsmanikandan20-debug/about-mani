@@ -1964,7 +1964,9 @@ const STOP_P = (()=>{ const L = 0.18, C = 0.40, out = [0.145, 0.183, 0.233, 0.32
   return out.sort((a,b)=>a-b); })();
 let STOPS = STOP_P.map(storyToScroll), lastR = 0, pin = null, pinUntil = 0;
 // the arrow buttons step through these story points
-const NAV_P = [0, 0.145, 0.183, 0.233, 0.323, 0.40 + 0.15*0.18, 0.40 + 0.5*0.18, 0.59, 0.66, 0.73, 0.80, 0.872, 0.915, 0.975];
+const NAV_P = [0, 0.145, 0.183, 0.233, 0.323, 0.40 + 0.15*0.18, 0.40 + 0.5*0.18, 0.59,
+  ...Array.from({length: 13}, (_, i)=> 0.645 + (i + 0.3)/13*(0.86 - 0.645)),   // every tool
+  0.876, 0.915, 0.975];                                                       // landing, career line, question
 function navGo(dir){
   const max = document.documentElement.scrollHeight - innerHeight; if (max <= 0) return;
   const now = scrollToStory(clamp(scrollY/max)), eps = 0.004;
