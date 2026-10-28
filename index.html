@@ -1972,8 +1972,16 @@ function navGo(dir){
   const now = scrollToStory(clamp(scrollY/max)), eps = 0.004;
   const next = dir > 0 ? NAV_P.find(p => p > now + eps) : [...NAV_P].reverse().find(p => p < now - eps);
   const goal = next === undefined ? (dir > 0 ? 1 : 0) : next;
-  window.scrollTo({top: Math.round(storyToScroll(goal)*max), behavior: reduced ? 'auto' : 'smooth'});
+  const to = Math.round(storyToScroll(goal)*max);
+  if (reduced){ window.scrollTo(0, to); return; }
+  // slow, gentle glide (ease in-out) instead of the browser's quick smooth-scroll
+  const from = scrollY, dist = to - from, dur = Math.min(2600, 1400 + Math.abs(dist)*0.08), t0 = performance.now(), id = ++navAnim;
+  const step = now => { if (id !== navAnim) return; const k = Math.min(1, (now - t0)/dur), e2 = k < 0.5 ? 4*k*k*k : 1 - Math.pow(-2*k + 2, 3)/2;
+    window.scrollTo(0, from + dist*e2); if (k < 1) requestAnimationFrame(step); };
+  requestAnimationFrame(step);
 }
+let navAnim = 0;
+['wheel','touchstart','keydown'].forEach(ev=>addEventListener(ev, ()=>{ navAnim++; }, {passive:true}));   // the visitor takes over -> stop the glide
 document.getElementById('navUp').addEventListener('click', ()=>navGo(-1));
 document.getElementById('navDown').addEventListener('click', ()=>navGo(1));
 addEventListener('scroll', ()=>{ const max = document.documentElement.scrollHeight - innerHeight, r = max > 0 ? scrollY/max : 0;
