@@ -1975,7 +1975,7 @@ function navGo(dir){
   const to = Math.round(storyToScroll(goal)*max);
   if (reduced){ window.scrollTo(0, to); return; }
   // slow, gentle glide (ease in-out) instead of the browser's quick smooth-scroll
-  const from = scrollY, dist = to - from, dur = Math.min(2600, 1400 + Math.abs(dist)*0.08), t0 = performance.now(), id = ++navAnim;
+  const from = scrollY, dist = to - from, dur = Math.min(7000, 4500 + Math.abs(dist)*0.05), t0 = performance.now(), id = ++navAnim;
   const step = now => { if (id !== navAnim) return; const k = Math.min(1, (now - t0)/dur), e2 = k < 0.5 ? 4*k*k*k : 1 - Math.pow(-2*k + 2, 3)/2;
     window.scrollTo(0, from + dist*e2); if (k < 1) requestAnimationFrame(step); };
   requestAnimationFrame(step);
